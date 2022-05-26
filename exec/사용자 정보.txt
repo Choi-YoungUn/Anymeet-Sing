@@ -1,0 +1,8 @@
+사이트 계정 :
+consultant@ssafy.com / ssafy123!
+coach@ssafy.com / ssafy123!
+ssafy.a505@gmail.com / prja505!
+
+DB 계정 :
+root / prj_a505!
+prj_a505 / prj_a505!

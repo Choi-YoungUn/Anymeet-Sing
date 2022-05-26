@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.anymeetsong.model.mapper.UserMapper">
+
+	<insert id="regist" parameterType="userDto">
+		insert into user(id,password,nickname,phone,answer,questions_id)
+		VALUES (#{id},#{password}, #{nickname}, #{phone}, #{answer}, #{questionsId})
+	</insert>
+
+	<select id="getQuestionList" resultType="QuestionsDto">
+		select *
+		from questions
+	</select>
+
+	<select id="checkValid" parameterType="map" resultType="map">
+		SELECT id, password, nickname, is_blocked, is_admin
+		FROM user
+		WHERE id = #{id}
+	</select>
+	
+	<select id="findByInfo" parameterType="map" resultType="map">
+		SELECT id
+		FROM user
+		WHERE phone = #{phone} and questions_id = #{questionsId} and answer = #{answer}
+	</select>
+	
+	<select id="findById" parameterType="map" resultType="map">
+		SELECT questions_id as questionsId, answer
+		FROM user u
+		JOIN questions q
+		ON u.questions_id = q.id
+		WHERE u.id = #{id}
+	</select>
+	
+	<update id="changePassword" parameterType="map">
+		UPDATE user
+		SET password = #{password}
+		WHERE id = #{id} and questions_id = #{questionsId} and answer = #{answer}
+	</update>
+	
+	<select id="getUser" parameterType="String" resultType="map">
+		select id, questions_id as questionsId, nickname, phone, answer, listen_count, singing_count 
+		from user 
+		where id = #{value};	
+	</select>
+
+	<update id="updateUser" parameterType="map">
+		UPDATE user
+		SET nickname = #{nickname}, phone = #{phone}, questions_id = #{questionsId}, answer = #{answer}
+		WHERE id = #{id};
+	</update>
+
+	<update id="updatePassword" parameterType="map">
+		UPDATE user
+		SET password = #{password}
+		WHERE id = #{id};
+	</update>
+
+	<delete id="deleteUser" parameterType="String">
+		DELETE FROM user
+		WHERE id = #{value};
+	</delete>
+	
+	<select id="checkPw" parameterType="String" resultType="String">
+		SELECT password
+		FROM user 
+		WHERE id = #{value};	
+	</select>
+	
+</mapper>

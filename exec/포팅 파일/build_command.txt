@@ -1,0 +1,19 @@
+cd frontend/anymeetsong													#frontend 폴더 이동
+sudo npm install														#dependency 설치
+sudo npm run build														#frontend 빌드
+docker cp dist nginx_a505:/usr/share/nginx/html							#nginx로 빌드 폴더 이동
+cd ../../backend/AnyMeetSong											#backend 폴더 이동
+
+/var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/3.8.4/bin/mvn \
+install -DskipTests=true 												#backend 빌드
+
+sudo kill -15 `cat /home/ubuntu/app.pid`								#기존 데몬 제거 - 최초 빌드 시 주석
+sudo rm /home/ubuntu/app.pid											#이전 pid 기록 제거 - 최초 빌드 시 주석
+sudo rm /home/ubuntu/app.out											#이전 로그 기록 제거 - 최초 빌드 시 주석
+sudo rm /home/ubuntu/app.war											#기존 backend 빌드 삭제 - 최초 빌드 시 주석
+sudo cp target/anymeetsong-0.0.1-SNAPSHOT.war /home/ubuntu/app.war		#새로 만든 빌드를 복사
+sudo bash -c "nohup java -jar /home/ubuntu/app.war > /home/ubuntu/app.out 2>&1 & echo \$! > /home/ubuntu/app.pid"
+#데몬으로 backend 실행, console 출력 파일 설정, pid 저장
+#sudo nohup java -jar /home/ubuntu/app.war 1>/dev/null 2>&1 &			#로그 파일을 만들고 싶지 않을 때
+
+cd ../..																#원 위치

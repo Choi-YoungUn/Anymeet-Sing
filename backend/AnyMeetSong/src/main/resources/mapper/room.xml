@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.anymeetsong.model.mapper.RoomMapper">
+
+	<resultMap type="map" id="roomList">
+		<result column="id" property="id"/>
+		<result column="title" property="title"/>
+		<result column="host_id" property="host_id"/>
+		<result column="person_count" property="person_count"/>
+	</resultMap>
+
+	<select id="getRoomList" resultMap="roomList">
+		SELECT r.id, r.title, r.host_id, count(*) as person_count
+		FROM room r left join room_participant p 
+		ON r.id = p.id
+		GROUP BY r.id;
+	</select>
+
+	<select id="getRoomAll" parameterType="map" resultMap="roomList">
+		SELECT r.id, r.password, r.title, r.host_id, count(*) as person_count
+		FROM room r left join room_participant p 
+		ON r.id = p.id
+		WHERE title LIKE CONCAT(#{title}, '%') 		
+		GROUP BY r.id;
+	</select>
+
+	<select id="getRoomWithPassword" parameterType="map" resultMap="roomList">
+		SELECT r.id, r.password, r.title, r.host_id, count(*) as person_count
+		FROM room r left join room_participant p 
+		ON r.id = p.id
+		WHERE password is null OR password = "" AND title LIKE CONCAT(#{title}, '%') 				
+		GROUP BY r.id;
+	</select>
+
+	<select id="getRoomWithoutPassword" parameterType="map" resultMap="roomList">
+		SELECT r.id, r.password, r.title, r.host_id, count(*) as person_count
+		FROM room r left join room_participant p 
+		ON r.id = p.id
+		WHERE password is not null AND password != "" AND title LIKE CONCAT(#{title}, '%') 				
+		GROUP BY r.id;
+	</select>
+
+	<select id="getRoomWithId" parameterType="String" resultMap="roomList">
+		SELECT r.id, r.password, r.title, r.host_id, count(*) as person_count
+		FROM room r left join room_participant p 
+		ON r.id = p.id
+ 		WHERE r.id = #{value};
+	</select>
+
+
+
+	<select id="isHostThere" parameterType="String" resultMap="roomList">
+		SELECT id
+		FROM room
+		where host_id = #{value};
+	</select>
+
+	<select id="isHostThereS" parameterType="String" resultType="String">
+		SELECT id
+		FROM room
+		where host_id = #{value};
+	</select>
+
+
+	<insert id="createRoom" parameterType="map">
+		INSERT INTO room(title, password, host_id)
+		VALUES (#{title}, #{password}, #{hostId})
+	</insert>
+
+	<insert id="joinRoom" parameterType="map">
+		INSERT INTO room_participant(id, user_id)
+		VALUES (#{id}, #{hostId})
+	</insert>
+	
+	<delete id="deleteRoom" parameterType="String">
+		DELETE FROM room
+		WHERE id = #{value};
+	</delete>
+
+	<delete id="deleteRoomParticipants" parameterType="String">
+		DELETE FROM room_participant
+		WHERE id = #{value};
+	</delete>
+	
+	<select id="findHost" parameterType="String" resultType="String">
+		SELECT host_id
+		FROM room
+		where id = #{value};	
+	</select>
+
+	<delete id="leave" parameterType="map">
+		DELETE FROM room_participant
+		WHERE user_id = #{user_id}
+		AND id = #{id};
+	</delete>
+
+	<delete id="leaveAll" parameterType="map">
+		DELETE FROM room_participant
+		WHERE id = #{id};
+	</delete>
+
+
+
+	<select id="updateRoom" parameterType="map">
+		UPDATE room
+		set title = #{title}, password = #{password}
+		where id = #{id};
+	</select>
+	
+	<select id="update" parameterType="map" resultType="map">
+		UPDATE room
+		set title = #{title}, password = #{password}
+		where id = #{id};
+	</select>
+	
+</mapper>
